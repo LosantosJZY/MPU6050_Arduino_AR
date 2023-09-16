@@ -330,7 +330,7 @@ uint8_t MPU6050::dmpInitialize() {
 	setDLPFMode(MPU6050_IMU::MPU6050_DLPF_BW_42);
 
 	DEBUG_PRINTLN(F("Setting gyro sensitivity to +/- 500 deg/sec & accelerometer to +/- 2 G..."));
-	setFullScaleGyroRange(MPU6050_IMU::MPU6050_GYRO_FS_2000);
+	setFullScaleGyroRange(MPU6050_IMU::MPU6050_GYRO_FS_500);
 	setFullScaleAccelRange( (MPU6050_IMU::MPU6050_ACCEL_FS_2));
 	// load DMP code into memory banks
 	DEBUG_PRINT(F("Writing DMP code to MPU memory banks ("));

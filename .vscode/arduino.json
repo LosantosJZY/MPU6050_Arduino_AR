@@ -1,5 +1,6 @@
 {
     "board": "arduino:avr:mega",
     "port": "COM4",
-    "configuration": "cpu=atmega2560"
+    "configuration": "cpu=atmega2560",
+    "sketch": "MPU6050_Arduino\\MPU6050_Arduino.ino"
 }
