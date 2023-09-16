@@ -252,12 +252,12 @@ float lowPassFilter(float beta, float last, float raw)
 }
 
 //// To use Kalman Filter
-#include <TrivialKalmanFilter.h>
-#define DT_COVARIANCE_RK 0.3 // Estimation of the noise covariances (process)
-#define DT_COVARIANCE_QK 0.05 // Estimation of the noise covariances (observation)
-TrivialKalmanFilter<float> filter_x(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
-TrivialKalmanFilter<float> filter_y(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
-TrivialKalmanFilter<float> filter_z(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
+// #include <TrivialKalmanFilter.h>
+// #define DT_COVARIANCE_RK 0.3 // Estimation of the noise covariances (process)
+// #define DT_COVARIANCE_QK 0.05 // Estimation of the noise covariances (observation)
+// TrivialKalmanFilter<float> filter_x(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
+// TrivialKalmanFilter<float> filter_y(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
+// TrivialKalmanFilter<float> filter_z(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
 
 uint32_t lastTicks = 0;
 uint32_t skip = 10;
@@ -295,124 +295,124 @@ void loop() {
             return;
         }
 
-#if (OUTPUT_SELECTION == OUTPUT_RAW_6AXIS)
+        #if (OUTPUT_SELECTION == OUTPUT_RAW_6AXIS)
 
-        // read raw accel/gyro measurements from device
-        mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+                // read raw accel/gyro measurements from device
+                mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-        // display comma-separated accel/gyro x/y/z values
-        Serial.print(ax*  2.0/32767); Serial.print(",");
-        Serial.print(ay*  2.0/32767); Serial.print(",");
-        Serial.print(az*  2.0/32767); Serial.print(",");
-        Serial.print(gx*500.0/32767); Serial.print(",");
-        Serial.print(gy*500.0/32767); Serial.print(",");
-        Serial.print(gz*500.0/32767); Serial.print(",");
-        Serial.println("");
+                // display comma-separated accel/gyro x/y/z values
+                Serial.print(ax*  2.0/32767); Serial.print(",");
+                Serial.print(ay*  2.0/32767); Serial.print(",");
+                Serial.print(az*  2.0/32767); Serial.print(",");
+                Serial.print(gx*500.0/32767); Serial.print(",");
+                Serial.print(gy*500.0/32767); Serial.print(",");
+                Serial.print(gz*500.0/32767); Serial.print(",");
+                Serial.println("");
 
-#elif (OUTPUT_SELECTION == OUTPUT_DMP_6AXIS)
+        #elif (OUTPUT_SELECTION == OUTPUT_DMP_6AXIS)
 
-        mpu.dmpGetQuaternion(&q, fifoBuffer);
-        mpu.dmpGetGravity(&gravity, &q);
-        // mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-        mpu.dmpGetAccel(&aa, fifoBuffer);
-        mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-        mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
+                mpu.dmpGetQuaternion(&q, fifoBuffer);
+                mpu.dmpGetGravity(&gravity, &q);
+                // mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+                mpu.dmpGetAccel(&aa, fifoBuffer);
+                mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+                mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
 
-        // Compute Acceleration
-        const float GRAVITY = 9.781;
-        uint32_t now = timerTicks;
-        float delta_t = (now - lastTicks) / 1000.0;
-        Serial.print(now - lastTicks); Serial.print(",");
+                // Compute Acceleration
+                const float GRAVITY = 9.781;
+                uint32_t now = timerTicks;
+                float delta_t = (now - lastTicks) / 1000.0;
+                Serial.print(now - lastTicks); Serial.print(",");
 
-        lastTicks = now;
-        float accl_x = float(aaWorld.x)/8192 * GRAVITY;
-        float accl_y = float(aaWorld.y)/8192 * GRAVITY;
-        float accl_z = float(aaWorld.z)/8192 * GRAVITY;
+                lastTicks = now;
+                float accl_x = float(aaWorld.x)/8192 * GRAVITY;
+                float accl_y = float(aaWorld.y)/8192 * GRAVITY;
+                float accl_z = float(aaWorld.z)/8192 * GRAVITY;
 
-        // No filter
-        accl[0] = accl_x; // lowPassFilter(0.025, accl[0], accl_x);
-        accl[1] = accl_y; // lowPassFilter(0.025, accl[1], accl_y);
-        accl[2] = accl_z; // lowPassFilter(0.025, accl[2], accl_z);
+                // No filter
+                accl[0] = accl_x; // lowPassFilter(0.025, accl[0], accl_x);
+                accl[1] = accl_y; // lowPassFilter(0.025, accl[1], accl_y);
+                accl[2] = accl_z; // lowPassFilter(0.025, accl[2], accl_z);
 
-        // LP Filter
-        // accl[0] = lowPassFilter(0.025, accl[0], accl_x);
-        // accl[1] = lowPassFilter(0.025, accl[1], accl_y);
-        // accl[2] = lowPassFilter(0.025, accl[2], accl_z);
+                // LP Filter
+                // accl[0] = lowPassFilter(0.025, accl[0], accl_x);
+                // accl[1] = lowPassFilter(0.025, accl[1], accl_y);
+                // accl[2] = lowPassFilter(0.025, accl[2], accl_z);
 
-        // Kalman Filter
-        // accl[0] = filter_x.update(accl[0]);
-        // accl[1] = filter_x.update(accl[1]);
-        // accl[2] = filter_x.update(accl[2]);
- 
-        // Minimum aceleration
-        const float ACCL_LIMIT = 0.02;
-        if (abs(accl[0]) < ACCL_LIMIT) { accl[0] = 0; } // velo[0] = 0; }
-        if (abs(accl[1]) < ACCL_LIMIT) { accl[1] = 0; } // velo[1] = 0; }
-        if (abs(accl[2]) < ACCL_LIMIT) { accl[2] = 0; } // velo[2] = 0; }
+                // Kalman Filter
+                // accl[0] = filter_x.update(accl[0]);
+                // accl[1] = filter_x.update(accl[1]);
+                // accl[2] = filter_x.update(accl[2]);
+        
+                // Minimum aceleration
+                const float ACCL_LIMIT = 0.02;
+                if (abs(accl[0]) < ACCL_LIMIT) { accl[0] = 0; } // velo[0] = 0; }
+                if (abs(accl[1]) < ACCL_LIMIT) { accl[1] = 0; } // velo[1] = 0; }
+                if (abs(accl[2]) < ACCL_LIMIT) { accl[2] = 0; } // velo[2] = 0; }
 
-        Serial.print(accl[0]); Serial.print(",");
-        Serial.print(accl[1]); Serial.print(",");
-        Serial.print(accl[2]); Serial.print(",");
+                Serial.print(accl[0]); Serial.print(",");
+                Serial.print(accl[1]); Serial.print(",");
+                Serial.print(accl[2]); Serial.print(",");
 
-        float half_delta_t2 = 0.5*delta_t*delta_t;
-        // Compute Displacement
-        //   d = u*t + 0.5*a*t*t
-        disp[0] += (velo[0]*delta_t)+(accl[0]*half_delta_t2);
-        disp[1] += (velo[1]*delta_t)+(accl[1]*half_delta_t2);
-        disp[2] += (velo[2]*delta_t)+(accl[2]*half_delta_t2);
+                float half_delta_t2 = 0.5*delta_t*delta_t;
+                // Compute Displacement
+                //   d = u*t + 0.5*a*t*t
+                disp[0] += (velo[0]*delta_t)+(accl[0]*half_delta_t2);
+                disp[1] += (velo[1]*delta_t)+(accl[1]*half_delta_t2);
+                disp[2] += (velo[2]*delta_t)+(accl[2]*half_delta_t2);
 
-        // Save last velocity for later use
-        velo_temp[0] =  velo[0];
-        velo_temp[1] =  velo[1];
-        velo_temp[2] =  velo[2];
+                // Save last velocity for later use
+                velo_temp[0] =  velo[0];
+                velo_temp[1] =  velo[1];
+                velo_temp[2] =  velo[2];
 
-        // Compute Velocity
-        //   v = a*t
-        velo[0] += (accl[0]*delta_t);
-        velo[1] += (accl[1]*delta_t);
-        velo[2] += (accl[2]*delta_t);
+                // Compute Velocity
+                //   v = a*t
+                velo[0] += (accl[0]*delta_t);
+                velo[1] += (accl[1]*delta_t);
+                velo[2] += (accl[2]*delta_t);
 
-        // Filter velocity
-        float m = 0;
-        if (count != 5)
-        {
-            velo_diff[count] = abs(
-                sqrt(pow(velo[0],2)+pow(velo[1],2)+pow(velo[2],2)) -
-                sqrt(pow(velo_temp[0],2)+pow(velo_temp[1],2)+pow(velo_temp[2],2)));
-            count++;
-        }
-        else
-        {
-            count = 0;
-            m = (velo_diff[0] + velo_diff[1] + velo_diff[2] +velo_diff[3] +velo_diff[4])/5;
-            if (m <= 0.01)
-            {
-                velo[0] = 0;
-                velo[1] = 0;
-                velo[2] = 0;
-            }
-        }
+                // Filter velocity
+                float m = 0;
+                if (count != 5)
+                {
+                    velo_diff[count] = abs(
+                        sqrt(pow(velo[0],2)+pow(velo[1],2)+pow(velo[2],2)) -
+                        sqrt(pow(velo_temp[0],2)+pow(velo_temp[1],2)+pow(velo_temp[2],2)));
+                    count++;
+                }
+                else
+                {
+                    count = 0;
+                    m = (velo_diff[0] + velo_diff[1] + velo_diff[2] +velo_diff[3] +velo_diff[4])/5;
+                    if (m <= 0.01)
+                    {
+                        velo[0] = 0;
+                        velo[1] = 0;
+                        velo[2] = 0;
+                    }
+                }
 
-        Serial.print(velo[0]); Serial.print(",");
-        Serial.print(velo[1]); Serial.print(",");
-        Serial.print(velo[2]); Serial.print(",");
+                Serial.print(velo[0]); Serial.print(",");
+                Serial.print(velo[1]); Serial.print(",");
+                Serial.print(velo[2]); Serial.print(",");
 
-        Serial.print(disp[0]); Serial.print(",");
-        Serial.print(disp[1]); Serial.print(",");
-        Serial.print(disp[2]); Serial.print(",");
+                Serial.print(disp[0]); Serial.print(",");
+                Serial.print(disp[1]); Serial.print(",");
+                Serial.print(disp[2]); Serial.print(",");
 
-        // Serial.print(float(ypr[2])*180.0/M_PI); Serial.print(",");
-        // Serial.print(float(ypr[1])*180.0/M_PI); Serial.print(",");
-        // Serial.print(float(ypr[0])*180.0/M_PI); Serial.print(",");
+                // Serial.print(float(ypr[2])*180.0/M_PI); Serial.print(",");
+                // Serial.print(float(ypr[1])*180.0/M_PI); Serial.print(",");
+                // Serial.print(float(ypr[0])*180.0/M_PI); Serial.print(",");
 
-        // mpu.dmpGetEuler(euler, &q);
-        // Serial.print(euler[0]*180.0/M_PI); Serial.print(",");
-        // Serial.print(euler[1]*180.0/M_PI); Serial.print(",");
-        // Serial.print(euler[2]*180.0/M_PI); Serial.print(",");
+                // mpu.dmpGetEuler(euler, &q);
+                // Serial.print(euler[0]*180.0/M_PI); Serial.print(",");
+                // Serial.print(euler[1]*180.0/M_PI); Serial.print(",");
+                // Serial.print(euler[2]*180.0/M_PI); Serial.print(",");
 
-        Serial.println("");
+                Serial.println("");
 
-#endif
+        #endif
 
         // blink LED to indicate activity
         blinkState = !blinkState;
