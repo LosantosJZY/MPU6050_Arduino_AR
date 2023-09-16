@@ -356,7 +356,7 @@ void loop() {
 
                 float half_delta_t2 = 0.5*delta_t*delta_t;
                 // Compute Displacement
-                //   d = u*t + 0.5*a*t*t
+                // d = u*t + 0.5*a*t*t
                 disp[0] += (velo[0]*delta_t)+(accl[0]*half_delta_t2);
                 disp[1] += (velo[1]*delta_t)+(accl[1]*half_delta_t2);
                 disp[2] += (velo[2]*delta_t)+(accl[2]*half_delta_t2);
@@ -385,7 +385,7 @@ void loop() {
                 {
                     count = 0;
                     m = (velo_diff[0] + velo_diff[1] + velo_diff[2] +velo_diff[3] +velo_diff[4])/5;
-                    if (m <= 0.01)
+                    if (m <= 0.002)
                     {
                         velo[0] = 0;
                         velo[1] = 0;
