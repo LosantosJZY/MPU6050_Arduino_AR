@@ -367,7 +367,7 @@ void loop() {
                 velo_temp[2] =  velo[2];
 
                 // Compute Velocity
-                //   v = a*t
+                //   v = v_0 + a*t
                 velo[0] += (accl[0]*delta_t);
                 velo[1] += (accl[1]*delta_t);
                 velo[2] += (accl[2]*delta_t);
