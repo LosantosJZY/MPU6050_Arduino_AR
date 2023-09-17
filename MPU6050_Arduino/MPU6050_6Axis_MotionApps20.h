@@ -271,7 +271,7 @@ const unsigned char dmpMemory[MPU6050_DMP_CODE_SIZE] PROGMEM = {
 };
 
 #ifndef MPU6050_DMP_FIFO_RATE_DIVISOR 
-#define MPU6050_DMP_FIFO_RATE_DIVISOR 0x09 // The New instance of the Firmware has this as the default
+#define MPU6050_DMP_FIFO_RATE_DIVISOR 0x07 // The New instance of the Firmware has this as the default
 #endif
 
 // I Simplified this:
@@ -330,8 +330,8 @@ uint8_t MPU6050::dmpInitialize() {
 	setDLPFMode(MPU6050_IMU::MPU6050_DLPF_BW_42);
 
 	DEBUG_PRINTLN(F("Setting gyro sensitivity to +/- 500 deg/sec & accelerometer to +/- 2 G..."));
-	setFullScaleGyroRange(MPU6050_IMU::MPU6050_GYRO_FS_2000);
-	setFullScaleAccelRange( (MPU6050_IMU::MPU6050_ACCEL_FS_2));
+	//setFullScaleGyroRange(MPU6050_IMU::MPU6050_GYRO_FS_2000);
+	//setFullScaleAccelRange( (MPU6050_IMU::MPU6050_ACCEL_FS_2));
 	// load DMP code into memory banks
 	DEBUG_PRINT(F("Writing DMP code to MPU memory banks ("));
 	DEBUG_PRINT(MPU6050_DMP_CODE_SIZE);
